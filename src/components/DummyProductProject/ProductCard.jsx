@@ -1,9 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import "../../css/product.css";
+import { FaRegHeart, FaHeart } from "react-icons/fa";
 
-function ProductCard({ product }) {
+function ProductCard({ product, onToggleFavorite, isFavorite }) {
   return (
     <div className="product-card">
+      <button
+        className="product-favorite"
+        onClick={() => onToggleFavorite(product.id)}
+      >
+        {isFavorite ? <FaHeart /> : <FaRegHeart />}
+      </button>
       <img
         className="product-image"
         src={product.thumbnail}
