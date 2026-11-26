@@ -90,7 +90,7 @@ function ProductList() {
       )}
       {/* ProductCard area */}
       <div className="product-grid">
-        {visibleProducts.map((product) => (
+        {visibleProducts?.map((product) => (
           <ProductCard
             key={product.id}
             product={product}

@@ -1,10 +1,16 @@
 import "./App.css";
-import ProductList from "./components/DummyProductProject/ProductList";
+import { useDispatch, useSelector } from "react-redux";
+import { decrement, increment } from "./redux/counterSlice";
 
 function App() {
+  const dispatch = useDispatch();
+  const { value } = useSelector((store) => store.counter);
+  console.log(value)
   return (
     <div>
-      <ProductList />
+      <div>{value}</div>
+      <div><button onClick={() => dispatch(increment())}>Arttır</button></div>
+      <div><button onClick={() => dispatch(decrement())}>Azalt</button></div>
     </div>
   );
 }

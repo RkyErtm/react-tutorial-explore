@@ -1,10 +1,12 @@
-# Product List (React Tutorial)
+# React Tutorial Explore
 
-A small React + Vite app that lists products from the DummyJSON API, with debounced search and a favorites filter. It is a learning project for React fundamentals.
+A React + Vite learning project. It contains a product list that uses the DummyJSON API (with debounced search and a favorites filter) and a simple counter built with Redux Toolkit, `useSelector` and `useDispatch`.
 
 ![Screenshot](Dummy-Product.png)
 
 ## Features
+
+### Product List
 
 - Lists the first 10 products from the API as cards (image, title, description, price, brand).
 - Search by product name. The request is sent 500 ms after the user stops typing.
@@ -16,10 +18,69 @@ A small React + Vite app that lists products from the DummyJSON API, with deboun
 
 Favorites are kept in component state only, so they reset when the page is refreshed.
 
+### Redux Toolkit Counter
+
+- Shows a counter value stored in the Redux store.
+- **Arttır** (increment) and **Azalt** (decrement) buttons change the value by dispatching actions.
+
+## Redux Toolkit Usage
+
+The Redux code lives in [`src/redux/`](src/redux/).
+
+**1. Create a slice** ([`counterSlice.jsx`](src/redux/counterSlice.jsx)). `createSlice` generates the reducer and the action creators together:
+
+```jsx
+export const counterSlice = createSlice({
+  name: "counter",
+  initialState: { value: 0 },
+  reducers: {
+    increment: (state) => { state.value = state.value + 1 },
+    decrement: (state) => { state.value = state.value - 1 },
+  },
+})
+
+export const { increment, decrement } = counterSlice.actions
+export default counterSlice.reducer
+```
+
+**2. Create the store** ([`store.jsx`](src/redux/store.jsx)). Pass the slice's **reducer** (the default export), not the slice object:
+
+```jsx
+import counterReducer from "./counterSlice"
+
+export const store = configureStore({
+  reducer: { counter: counterReducer },
+})
+```
+
+Passing the slice object instead (`counter: counterSlice`) causes the error *"Store does not have a valid reducer"*.
+
+**3. Provide the store** ([`main.jsx`](src/main.jsx)). Wrap the app with `Provider` so every component can reach the store:
+
+```jsx
+<Provider store={store}>
+  <App />
+</Provider>
+```
+
+**4. Read and update state in a component** ([`App.jsx`](src/App.jsx)):
+
+```jsx
+const dispatch = useDispatch()
+const { value } = useSelector((store) => store.counter)
+
+<button onClick={() => dispatch(increment())}>Arttır</button>
+<button onClick={() => dispatch(decrement())}>Azalt</button>
+```
+
+- `useSelector` reads a piece of the store state. The component re-renders when that piece changes.
+- `useDispatch` returns the `dispatch` function, which sends an action such as `increment()` to the store.
+
 ## Tech Stack
 
 - [React](https://react.dev/) 19
 - [Vite](https://vite.dev/) 8 with `@vitejs/plugin-react`
+- [Redux Toolkit](https://redux-toolkit.js.org/) and [React Redux](https://react-redux.js.org/) for global state
 - [Axios](https://axios-http.com/) for HTTP requests
 - [React Icons](https://react-icons.github.io/react-icons/) (Font Awesome set)
 - Plain CSS (one file per feature)
@@ -37,7 +98,7 @@ Product data comes from the free [DummyJSON](https://dummyjson.com) API:
 ```bash
 # 1. Clone the repository
 git clone <your-repo-url>
-cd react-tutorial
+cd react-tutorial-explore
 
 # 2. Install dependencies
 npm install
@@ -53,7 +114,7 @@ Restart the dev server after changing `.env`, because Vite only reads it on star
 
 Other scripts: `npm run build`, `npm run preview`, `npm run lint`.
 
-`App.jsx` currently renders only the product list. The currency converter and todo components are earlier practice projects kept in the repo.
+`App.jsx` currently renders the Redux counter. To see the product list, render `<ProductList />` from `src/components/DummyProductProject/ProductList.jsx` in `App.jsx`. The currency converter and todo components are earlier practice projects kept in the repo.
 
 ## What I Learned
 
@@ -64,10 +125,8 @@ Other scripts: `npm run build`, `npm run preview`, `npm run lint`.
 - Deriving a filtered list during render instead of storing it in state.
 - Updating arrays immutably (`filter` and spread) instead of mutating them.
 - Reading environment variables in Vite with `import.meta.env`.
-
-## Next Steps
-
-- Persist favorites (for example in `localStorage`).
-- Clear the error message after a successful request.
-- Add a router and mount the currency converter and todo projects as separate pages.
-- Add pagination or a "load more" option instead of a fixed limit of 10.
+- Creating a slice with `createSlice`, which generates the reducer and the action creators.
+- Setting up a store with `configureStore` and providing it to the app with `Provider`.
+- Reading state with `useSelector` and sending actions with `useDispatch`.
+- The store needs the slice's `reducer`, not the slice object.
+- Reducers in Redux Toolkit can write `state.value = ...` directly, because Immer turns those changes into a new immutable state.
